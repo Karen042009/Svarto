@@ -47,7 +47,7 @@
           Python, HTML, CSS, SQL, JavaScript և Django:
         </p>
         <a href="#projects" class="btn btn-light btn-lg"
-          >Տեսնել մեր աշխատանքները</a
+          >Տեսնել մեր աշակերտներին</a
         >
       </div>
     </header>
@@ -76,56 +76,113 @@
       </div>
     </section>
 
-    <h1>Սեղմիր կոճակը՝ բոլոր ուսուցիչներին տեսնելու համար</h1>
-    <button id="loadTeachers">Բեռնել Ուսուցիչները</button>
-
-    <ul id="teacherList"></ul>
-
-    <script>
-      document
-        .getElementById("loadTeachers")
-        .addEventListener("click", function () {
-          fetch("/teachers/json/")
-            .then((response) => response.json())
-            .then((data) => {
-              const teacherList = document.getElementById("teacherList");
-              teacherList.innerHTML = "";
-              data.forEach((teacher) => {
-                const li = document.createElement("li");
-                li.textContent = teacher.name; // փոխիր ըստ քո մոդելի դաշտի
-                teacherList.appendChild(li);
-              });
-            });
-        });
-    </script>
     <section id="projects" class="py-5 bg-light">
       <div class="container">
         <h2 class="text-center mb-4">Դպրոց</h2>
         <div class="row">
-          <div class="col-md-4">
+          <div class="col-md-4 mb-4">
             <div class="card">
               <div class="card-body">
-                <h5 class="card-title">Chess Game</h5>
-                <p class="card-text">Շախմատի խաղ՝ ստեղծված Python-ով</p>
+                <button id="loadTeachers">Ուսուցիչները</button>
+                <ul id="teacherList"></ul>
+                <script>
+                  document
+                    .getElementById("loadTeachers")
+                    .addEventListener("click", function () {
+                      const teacherList =
+                        document.getElementById("teacherList");
+                      if (!teacherList.dataset.loaded) {
+                        fetch("/teachers/json/")
+                          .then((response) => response.json())
+                          .then((data) => {
+                            teacherList.innerHTML = "";
+                            data.forEach((teacher) => {
+                              const li = document.createElement("li");
+                              li.textContent = teacher.name;
+                              teacherList.appendChild(li);
+                            });
+                            teacherList.dataset.loaded = "true";
+                          });
+                      }
+                      if (teacherList.style.display === "none") {
+                        teacherList.style.display = "block"; 
+                      } else {
+                        teacherList.style.display = "none";
+                      }
+                    });
+                </script>
               </div>
             </div>
           </div>
-          <div class="col-md-4">
+
+          <div class="col-md-4 mb-4">
             <div class="card">
               <div class="card-body">
-                <h5 class="card-title">Telegram Bot - Ai, Translate</h5>
-                <p class="card-text">
-                  Թելեգրամ բոտ, որը կատարում է թարգմանություն և տարբեր
-                  ֆունկցիաներ
-                </p>
+                <button id="loadStudents">Աշակերտները</button>
+                <ul id="studentList"></ul>
+                <script>
+                  document
+                    .getElementById("loadStudents")
+                    .addEventListener("click", function () {
+                      const studentList =
+                        document.getElementById("studentList");
+                      if (!studentList.dataset.loaded) {
+                        fetch("/students/json/")
+                          .then((response) => response.json())
+                          .then((data) => {
+                            studentList.innerHTML = "";
+                            data.forEach((student) => {
+                              const li = document.createElement("li");
+                              li.textContent = `${student.name} - ${student.class}`;
+                              studentList.appendChild(li);
+                            });
+                            studentList.dataset.loaded = "true";
+                          });
+                      }
+                      if (studentList.style.display === "none") {
+                        studentList.style.display = "block"; 
+                      } else {
+                        studentList.style.display = "none"; 
+                      }
+                    });
+                </script>
               </div>
             </div>
           </div>
-          <div class="col-md-4">
+
+          <div class="col-md-4 mb-4">
             <div class="card">
               <div class="card-body">
-                <h5 class="card-title">Game 2048</h5>
-                <p class="card-text">2048 խաղի տարբերակ՝ Python-ով</p>
+                <button id="loadClasses">Դասարանները</button>
+                <ul id="classList"></ul>
+                <script>
+                  document
+                    .getElementById("loadClasses")
+                    .addEventListener("click", function () {
+                      const classList = document.getElementById("classList");
+
+                      if (!classList.dataset.loaded) {
+                        fetch("/classes/json/")
+                          .then((response) => response.json())
+                          .then((data) => {
+                            classList.innerHTML = "";
+                            data.forEach((classData) => {
+                              const li = document.createElement("li");
+                              li.textContent = `${
+                                classData.class_name
+                              } - Աշակերտներ: ${classData.students.join(", ")}`;
+                              classList.appendChild(li);
+                            });
+                            classList.dataset.loaded = "true";
+                          });
+                      }
+                      if (classList.style.display === "none") {
+                        classList.style.display = "block"; լ
+                      } else {
+                        classList.style.display = "none";
+                      }
+                    });
+                </script>
               </div>
             </div>
           </div>
