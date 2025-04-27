@@ -51,7 +51,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "my_biography.urls"
+ROOT_URLCONF = "Svarto.urls"
 
 TEMPLATES = [
     {
@@ -68,7 +68,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "my_biography.wsgi.application"
+WSGI_APPLICATION = "Svarto.wsgi.application"
 
 
 # Database
