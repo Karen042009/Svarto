@@ -83,103 +83,153 @@
           <div class="col-md-4 mb-4">
             <div class="card">
               <div class="card-body">
-                <button id="loadTeachers">Ուսուցիչները</button>
-                <ul id="teacherList"></ul>
-                <script>
-                  document
-                    .getElementById("loadTeachers")
-                    .addEventListener("click", function () {
-                      const teacherList =
-                        document.getElementById("teacherList");
-                      if (!teacherList.dataset.loaded) {
-                        fetch("/teachers/json/")
-                          .then((response) => response.json())
-                          .then((data) => {
-                            teacherList.innerHTML = "";
-                            data.forEach((teacher) => {
-                              const li = document.createElement("li");
-                              li.textContent = teacher.name;
-                              teacherList.appendChild(li);
-                            });
-                            teacherList.dataset.loaded = "true";
-                          });
-                      }
-                      if (teacherList.style.display === "none") {
-                        teacherList.style.display = "block"; 
-                      } else {
-                        teacherList.style.display = "none";
-                      }
-                    });
-                </script>
+                <button class="loadButton" data-target="teacherList">Ուսուցիչները</button>
+                <ul id="teacherList" class="dataList"></ul>
               </div>
             </div>
           </div>
-
+    
           <div class="col-md-4 mb-4">
             <div class="card">
               <div class="card-body">
-                <button id="loadStudents">Աշակերտները</button>
-                <ul id="studentList"></ul>
-                <script>
-                  document
-                    .getElementById("loadStudents")
-                    .addEventListener("click", function () {
-                      const studentList =
-                        document.getElementById("studentList");
-                      if (!studentList.dataset.loaded) {
-                        fetch("/students/json/")
-                          .then((response) => response.json())
-                          .then((data) => {
-                            studentList.innerHTML = "";
-                            data.forEach((student) => {
-                              const li = document.createElement("li");
-                              li.textContent = `${student.name} - ${student.class}`;
-                              studentList.appendChild(li);
-                            });
-                            studentList.dataset.loaded = "true";
-                          });
-                      }
-                      if (studentList.style.display === "none") {
-                        studentList.style.display = "block"; 
-                      } else {
-                        studentList.style.display = "none"; 
-                      }
-                    });
-                </script>
+                <button class="loadButton" data-target="studentList">Աշակերտները</button>
+                <ul id="studentList" class="dataList"></ul>
               </div>
             </div>
           </div>
-
+    
           <div class="col-md-4 mb-4">
             <div class="card">
               <div class="card-body">
-                <button id="loadClasses">Դասարանները</button>
-                <ul id="classList"></ul>
+                <button class="loadButton" data-target="classList">Դասարանները</button>
+                <ul id="classList" class="dataList"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <script>
+        document.querySelectorAll('.loadButton').forEach(button => {
+          button.addEventListener("click", function () {
+            const targetList = document.getElementById(button.dataset.target);
+            if (!targetList.dataset.loaded) {
+              let url = '';
+              if (button.textContent.includes('Ուսուցիչ')) {
+                url = '/teachers/json/';
+              } else if (button.textContent.includes('Աշակերտ')) {
+                url = '/students/json/';
+              } else if (button.textContent.includes('Դասարան')) {
+                url = '/classes/json/';
+              }
+    
+              fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                  targetList.innerHTML = "";
+                  data.forEach(item => {
+                    const li = document.createElement("li");
+                    if (item.name) {
+                      li.textContent = item.name;
+                    } else if (item.class_name) {
+                      if (item.teachers) {
+                        li.textContent = `${item.class_name} - Ուսուցիչներ: ${item.teachers.join(', ')}`;
+                      } else {
+                        li.textContent = `${item.class_name} - Աշակերտներ: ${item.students.join(', ')}`;
+                      }
+                    }
+                    targetList.appendChild(li);
+                  });
+                  targetList.dataset.loaded = "true";
+                });
+            }
+            targetList.style.display = (targetList.style.display === "none") ? "block" : "none";
+          });
+        });
+      </script>
+    
+        <h2 class="text-center mb-4">Աշակերտի մուտքագրում</h2>
+        <div class="row">
+          <div class="col-md-4 mb-4">
+            <div class="card">
+              <div class="card-body">
+                <label for="firstName">Անուն</label>
+                <input type="text" id="firstName" class="form-control mb-2" />
+
+                <label for="lastName">Ազգանուն</label>
+                <input type="text" id="lastName" class="form-control mb-2" />
+
+                <label for="classId">Դասարան ID</label>
+                <input type="number" id="classId" class="form-control mb-3" />
+
+                <button id="saveStudent" class="btn btn-primary">
+                  Պահպանել
+                </button>
+
+                <div
+                  id="saveMessage"
+                  class="mt-3 text-success"
+                  style="display: none"
+                >
+                  ✅ Աշակերտը հաջողությամբ ավելացվեց։
+                </div>
+
                 <script>
                   document
-                    .getElementById("loadClasses")
+                    .getElementById("saveStudent")
                     .addEventListener("click", function () {
-                      const classList = document.getElementById("classList");
+                      const firstName =
+                        document.getElementById("firstName").value;
+                      const lastName =
+                        document.getElementById("lastName").value;
+                      const classId = document.getElementById("classId").value;
 
-                      if (!classList.dataset.loaded) {
-                        fetch("/classes/json/")
-                          .then((response) => response.json())
-                          .then((data) => {
-                            classList.innerHTML = "";
-                            data.forEach((classData) => {
-                              const li = document.createElement("li");
-                              li.textContent = `${
-                                classData.class_name
-                              } - Աշակերտներ: ${classData.students.join(", ")}`;
-                              classList.appendChild(li);
-                            });
-                            classList.dataset.loaded = "true";
-                          });
+                      fetch("/students/create/", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                          "X-CSRFToken": getCookie("csrftoken"),
+                        },
+                        body: JSON.stringify({
+                          first_name: firstName,
+                          last_name: lastName,
+                          class_id: classId,
+                        }),
+                      }).then((response) => {
+                        if (response.ok) {
+                          document.getElementById("saveMessage").style.display =
+                            "block";
+                          loadStudents(); 
+                          resetForm(); 
+                        } else {
+                          alert("❌ Սխալ։ Խնդրում ենք ստուգել տվյալները։");
+                        }
+                      });
+
+                      function getCookie(name) {
+                        let cookieValue = null;
+                        if (document.cookie && document.cookie !== "") {
+                          const cookies = document.cookie.split(";");
+                          for (let i = 0; i < cookies.length; i++) {
+                            const cookie = cookies[i].trim();
+                            if (
+                              cookie.substring(0, name.length + 1) ===
+                              name + "="
+                            ) {
+                              cookieValue = decodeURIComponent(
+                                cookie.substring(name.length + 1)
+                              );
+                              break;
+                            }
+                          }
+                        }
+                        return cookieValue;
                       }
-                      if (classList.style.display === "none") {
-                        classList.style.display = "block"; լ
-                      } else {
-                        classList.style.display = "none";
+
+                      function resetForm() {
+                        document.getElementById("firstName").value = "";
+                        document.getElementById("lastName").value = "";
+                        document.getElementById("classId").value = "";
                       }
                     });
                 </script>

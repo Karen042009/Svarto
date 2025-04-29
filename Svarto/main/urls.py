@@ -8,6 +8,7 @@ urlpatterns = [
     path('teachers/json/', views.get_teachers, name='get_teachers'),
     path('students/', views.student_list, name='student_list'), 
     path('students/json/', views.get_students, name='get_students'),
+    path('students/create/', views.create_student, name='create_student'), 
     path('classes/', views.class_list, name='class_list'),  
     path('classes/json/', views.get_classes, name='get_classes'), 
     path('admin/', admin.site.urls),
