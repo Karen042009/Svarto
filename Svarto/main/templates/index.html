@@ -88,7 +88,7 @@
               </div>
             </div>
           </div>
-    
+      
           <div class="col-md-4 mb-4">
             <div class="card">
               <div class="card-body">
@@ -97,7 +97,7 @@
               </div>
             </div>
           </div>
-    
+      
           <div class="col-md-4 mb-4">
             <div class="card">
               <div class="card-body">
@@ -122,20 +122,21 @@
               } else if (button.textContent.includes('Դասարան')) {
                 url = '/classes/json/';
               }
-    
+      
               fetch(url)
                 .then(response => response.json())
                 .then(data => {
                   targetList.innerHTML = "";
                   data.forEach(item => {
                     const li = document.createElement("li");
-                    if (item.name) {
-                      li.textContent = item.name;
+      
+                    if (item.id && item.name) {
+                      li.textContent = `ID: ${item.id} - ${item.name}`;
                     } else if (item.class_name) {
                       if (item.teachers) {
-                        li.textContent = `${item.class_name} - Ուսուցիչներ: ${item.teachers.join(', ')}`;
-                      } else {
-                        li.textContent = `${item.class_name} - Աշակերտներ: ${item.students.join(', ')}`;
+                        li.textContent = `ID: ${item.id} - ${item.class_name} - Ուսուցիչներ: ${item.teachers.join(', ')}`;
+                      } else if (item.students) {
+                        li.textContent = `ID: ${item.id} - ${item.class_name} - Աշակերտներ: ${item.students.join(', ')}`;
                       }
                     }
                     targetList.appendChild(li);
