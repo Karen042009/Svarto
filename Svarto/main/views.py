@@ -86,6 +86,19 @@ def get_classes(request):
 
 
 @csrf_exempt
+def delete_student_view(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        student_id = data.get("student_id")
+        try:
+            student = Student.objects.get(id=student_id)
+            student.delete()
+            return JsonResponse({"message": "Աշակերտը հաջողությամբ ջնջվեց։"})
+        except Student.DoesNotExist:
+            return JsonResponse({"message": "Աշակերտ այդ ID-ով գոյություն չունի։"})
+    return JsonResponse({"message": "Սխալ հարցում։"}, status=400)
+
+@csrf_exempt
 def create_teacher(request):
     if request.method == "POST":
         data = json.loads(request.body)

@@ -362,6 +362,44 @@
         document.addEventListener("DOMContentLoaded", loadStudents);
       </script>
     </section>
+    <label for="student_id">Աշակերտի ID:</label>
+    <input type="number" id="student_id" required />
+    <button onclick="deleteStudent()">Ջնջել աշակերտին</button>
+
+    <p id="result"></p>
+
+    <script>
+      function getCSRFToken() {
+        let cookieValue = null;
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.startsWith("csrftoken=")) {
+            cookieValue = cookie.substring("csrftoken=".length);
+            break;
+          }
+        }
+        return cookieValue;
+      }
+
+      function deleteStudent() {
+        const studentId = document.getElementById("student_id").value;
+        const csrfToken = getCSRFToken();
+
+        fetch("/students/delete/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken,
+          },
+          body: JSON.stringify({ student_id: studentId }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("result").innerText = data.message;
+          });
+      }
+    </script>
 
     <section id="contact" class="py-5">
       <div class="container">

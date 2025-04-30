@@ -12,5 +12,6 @@ urlpatterns = [
     path('students/create/', views.create_student, name='create_student'), 
     path('classes/', views.class_list, name='class_list'),  
     path('classes/json/', views.get_classes, name='get_classes'), 
+    path('students/delete/', views.delete_student_view, name='delete_student'), 
     path('admin/', admin.site.urls),
 ]
