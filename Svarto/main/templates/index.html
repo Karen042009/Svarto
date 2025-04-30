@@ -83,60 +83,74 @@
           <div class="col-md-4 mb-4">
             <div class="card">
               <div class="card-body">
-                <button class="loadButton" data-target="teacherList">Ուսուցիչները</button>
+                <button class="loadButton" data-target="teacherList">
+                  Ուսուցիչները
+                </button>
                 <ul id="teacherList" class="dataList"></ul>
               </div>
             </div>
           </div>
-      
+
           <div class="col-md-4 mb-4">
             <div class="card">
               <div class="card-body">
-                <button class="loadButton" data-target="studentList">Աշակերտները</button>
+                <button class="loadButton" data-target="studentList">
+                  Աշակերտները
+                </button>
                 <ul id="studentList" class="dataList"></ul>
               </div>
             </div>
           </div>
-      
+
           <div class="col-md-4 mb-4">
             <div class="card">
               <div class="card-body">
-                <button class="loadButton" data-target="classList">Դասարանները</button>
+                <button class="loadButton" data-target="classList">
+                  Դասարանները
+                </button>
                 <ul id="classList" class="dataList"></ul>
               </div>
             </div>
           </div>
         </div>
       </div>
-      
+
       <script>
-        document.querySelectorAll('.loadButton').forEach(button => {
+        document.querySelectorAll(".loadButton").forEach((button) => {
           button.addEventListener("click", function () {
             const targetList = document.getElementById(button.dataset.target);
             if (!targetList.dataset.loaded) {
-              let url = '';
-              if (button.textContent.includes('Ուսուցիչ')) {
-                url = '/teachers/json/';
-              } else if (button.textContent.includes('Աշակերտ')) {
-                url = '/students/json/';
-              } else if (button.textContent.includes('Դասարան')) {
-                url = '/classes/json/';
+              let url = "";
+              if (button.textContent.includes("Ուսուցիչ")) {
+                url = "/teachers/json/";
+              } else if (button.textContent.includes("Աշակերտ")) {
+                url = "/students/json/";
+              } else if (button.textContent.includes("Դասարան")) {
+                url = "/classes/json/";
               }
-      
+
               fetch(url)
-                .then(response => response.json())
-                .then(data => {
+                .then((response) => response.json())
+                .then((data) => {
                   targetList.innerHTML = "";
-                  data.forEach(item => {
+                  data.forEach((item) => {
                     const li = document.createElement("li");
-      
+
                     if (item.id && item.name) {
                       li.textContent = `ID: ${item.id} - ${item.name}`;
                     } else if (item.class_name) {
                       if (item.teachers) {
-                        li.textContent = `ID: ${item.id} - ${item.class_name} - Ուսուցիչներ: ${item.teachers.join(', ')}`;
+                        li.textContent = `ID: ${item.id} - ${
+                          item.class_name
+                        } - Ուսուցիչներ: ${item.teachers
+                          .map((s) => s.name)
+                          .join(", ")}`;
                       } else if (item.students) {
-                        li.textContent = `ID: ${item.id} - ${item.class_name} - Աշակերտներ: ${item.students.join(', ')}`;
+                        li.textContent = `ID: ${item.id} - ${
+                          item.class_name
+                        } - Աշակերտներ: ${item.students
+                          .map((s) => s.name)
+                          .join(", ")}`;
                       }
                     }
                     targetList.appendChild(li);
@@ -144,16 +158,52 @@
                   targetList.dataset.loaded = "true";
                 });
             }
-            targetList.style.display = (targetList.style.display === "none") ? "block" : "none";
+            targetList.style.display =
+              targetList.style.display === "none" ? "block" : "none";
           });
         });
       </script>
-    
-        <h2 class="text-center mb-4">Աշակերտի մուտքագրում</h2>
+
+      <h2 class="text-center mb-4">Մուտքագրում</h2>
+      <div class="container mt-4">
         <div class="row">
-          <div class="col-md-4 mb-4">
+          <div class="col-md-6 mb-4">
             <div class="card">
               <div class="card-body">
+                <h5 class="card-title">Ավելացնել Դասատու</h5>
+                <label for="teacherFirstName">Անուն</label>
+                <input
+                  type="text"
+                  id="teacherFirstName"
+                  class="form-control mb-2"
+                />
+
+                <label for="teacherLastName">Ազգանուն</label>
+                <input
+                  type="text"
+                  id="teacherLastName"
+                  class="form-control mb-3"
+                />
+
+                <button id="saveTeacher" class="btn btn-success">
+                  Պահպանել
+                </button>
+
+                <div
+                  id="teacherSaveMessage"
+                  class="mt-3 text-success"
+                  style="display: none"
+                >
+                  ✅ Դասատուն հաջողությամբ ավելացվեց։
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-4">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Ավելացնել Աշակերտ</h5>
                 <label for="firstName">Անուն</label>
                 <input type="text" id="firstName" class="form-control mb-2" />
 
@@ -166,6 +216,7 @@
                 <button id="saveStudent" class="btn btn-primary">
                   Պահպանել
                 </button>
+                <h5 id="ddd"></h5>
 
                 <div
                   id="saveMessage"
@@ -174,71 +225,142 @@
                 >
                   ✅ Աշակերտը հաջողությամբ ավելացվեց։
                 </div>
-
-                <script>
-                  document
-                    .getElementById("saveStudent")
-                    .addEventListener("click", function () {
-                      const firstName =
-                        document.getElementById("firstName").value;
-                      const lastName =
-                        document.getElementById("lastName").value;
-                      const classId = document.getElementById("classId").value;
-
-                      fetch("/students/create/", {
-                        method: "POST",
-                        headers: {
-                          "Content-Type": "application/json",
-                          "X-CSRFToken": getCookie("csrftoken"),
-                        },
-                        body: JSON.stringify({
-                          first_name: firstName,
-                          last_name: lastName,
-                          class_id: classId,
-                        }),
-                      }).then((response) => {
-                        if (response.ok) {
-                          document.getElementById("saveMessage").style.display =
-                            "block";
-                          loadStudents(); 
-                          resetForm(); 
-                        } else {
-                          alert("❌ Սխալ։ Խնդրում ենք ստուգել տվյալները։");
-                        }
-                      });
-
-                      function getCookie(name) {
-                        let cookieValue = null;
-                        if (document.cookie && document.cookie !== "") {
-                          const cookies = document.cookie.split(";");
-                          for (let i = 0; i < cookies.length; i++) {
-                            const cookie = cookies[i].trim();
-                            if (
-                              cookie.substring(0, name.length + 1) ===
-                              name + "="
-                            ) {
-                              cookieValue = decodeURIComponent(
-                                cookie.substring(name.length + 1)
-                              );
-                              break;
-                            }
-                          }
-                        }
-                        return cookieValue;
-                      }
-
-                      function resetForm() {
-                        document.getElementById("firstName").value = "";
-                        document.getElementById("lastName").value = "";
-                        document.getElementById("classId").value = "";
-                      }
-                    });
-                </script>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <script>
+        document
+          .getElementById("saveTeacher")
+          .addEventListener("click", function () {
+            const firstName = document.getElementById("teacherFirstName").value;
+            const lastName = document.getElementById("teacherLastName").value;
+
+            fetch("/teachers/create/", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCookie("csrftoken"),
+              },
+              body: JSON.stringify({
+                first_name: firstName,
+                last_name: lastName,
+              }),
+            }).then((response) => {
+              console.log(response);
+              if (response.ok) {
+                document.getElementById("teacherSaveMessage").style.display =
+                  "block";
+                document.getElementById("teacherFirstName").value = "";
+                document.getElementById("teacherLastName").value = "";
+                fetch("/teachers/json/")
+                  .then((response) => response.json())
+                  .then((data) => {
+                    console.log(data);
+                    const teacherList = document.getElementById("teacherList");
+                    teacherList.innerHTML = "";
+                    data.forEach((teacher) => {
+                      const li = document.createElement("li");
+                      li.textContent = `ID: ${teacher.id} - ${teacher.name}`;
+                      teacherList.appendChild(li);
+                    });
+                  })
+                  .catch((error) => {
+                    console.error("Սխալ տվյալների բեռնումում:", error);
+                  });
+              } else {
+                alert("❌ Սխալ։ Ստուգիր դասատուի տվյալները։");
+              }
+            });
+          });
+        function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === name + "=") {
+                cookieValue = decodeURIComponent(
+                  cookie.substring(name.length + 1)
+                );
+                break;
+              }
+            }
+          }
+          return cookieValue;
+        }
+        document
+          .getElementById("saveStudent")
+          .addEventListener("click", function () {
+            const firstName = document.getElementById("firstName").value;
+            const lastName = document.getElementById("lastName").value;
+            const classId = document.getElementById("classId").value;
+            fetch("/students/create/", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCookie("csrftoken"),
+              },
+              body: JSON.stringify({
+                first_name: firstName,
+                last_name: lastName,
+                class_id: classId,
+              }),
+            }).then((response) => {
+              const messageElement = document.getElementById("message");
+              if (response.ok) {
+                messageElement.style.color = "green";
+                messageElement.textContent =
+                  "✅ Աշակերտը հաջողությամբ ավելացվել է!";
+                loadStudents();
+                resetForm();
+              } else {
+                messageElement.style.color = "red";
+                messageElement.textContent = "❌ Սխալ։ Ստուգեք տվյալները։";
+              }
+            });
+            function getCookie(name) {
+              let cookieValue = null;
+              if (document.cookie && document.cookie !== "") {
+                const cookies = document.cookie.split(";");
+                for (let i = 0; i < cookies.length; i++) {
+                  const cookie = cookies[i].trim();
+                  if (cookie.substring(0, name.length + 1) === name + "=") {
+                    cookieValue = decodeURIComponent(
+                      cookie.substring(name.length + 1)
+                    );
+                    break;
+                  }
+                }
+              }
+              return cookieValue;
+            }
+            function resetForm() {
+              document.getElementById("firstName").value = "";
+              document.getElementById("lastName").value = "";
+              document.getElementById("classId").value = "";
+            }
+          });
+        function loadStudents() {
+          fetch("/students/json/")
+            .then((response) => response.json())
+            .then((data) => {
+              const studentList = document.getElementById("studentList");
+              studentList.innerHTML = "";
+              data.forEach((student) => {
+                const li = document.createElement("li");
+                li.textContent = `${student.name} - Դասարան: ${student.class}`;
+                studentList.appendChild(li);
+              });
+            })
+            .catch((error) => {
+              console.error("Սխալ տվյալների բեռնումում:", error);
+            });
+        }
+        document.addEventListener("DOMContentLoaded", loadStudents);
+      </script>
     </section>
 
     <section id="contact" class="py-5">
